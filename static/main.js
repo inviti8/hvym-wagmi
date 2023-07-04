@@ -14,21 +14,13 @@ import { Web3Modal } from "https://unpkg.com/@web3modal/html@2.6.2";
 const { mainnet, polygon, avalanche, arbitrum } = WagmiCoreChains;
 const { configureChains, createConfig } = WagmiCore;
 
-// 1. Define chains
 const chains = [mainnet, polygon, avalanche, arbitrum];
 
-// 1. Define ui elements
 const connectButton = document.getElementById("connect-button");
-const disconnectButton = document.getElementById("disconnect-button");
 
-let session;
+let WCsession;
+let WCconnected = false;
 
-function logData(data) {
-    console.log('############################')
-    console.info(data)
-}
-
-// 2. Create modal client, add your project id
 const web3Modal = new WalletConnectModalSign({
   projectId: "4b158e5711a8ed2e288d76772f6beaaf",
   metadata: {
@@ -39,17 +31,20 @@ const web3Modal = new WalletConnectModalSign({
   },
 });
 
-web3Modal.onSessionEvent(logData);
-web3Modal.onSessionDelete(logData)
-
-console.log("!!!!!!!")
 console.log(web3Modal)
 
-// 3. Connect
-async function onConnect() {
+function WCToggle(){
+    if(WCconnected){
+        WCdisconnect()
+    }else{
+        WCconnect()
+    }
+}
+
+async function WCconnect() {
   try {
     connectButton.disabled = true;
-    session = await web3Modal.connect({
+    WCsession = await web3Modal.connect({
       requiredNamespaces: {
         eip155: {
           methods: ["eth_sendTransaction", "personal_sign"],
@@ -58,20 +53,22 @@ async function onConnect() {
         },
       },
     });
-    console.info(session);
+    console.info(WCsession);
 
   } catch (err) {
     console.error(err);
   } finally {
     connectButton.disabled = false;
-    console.info("Connected!!!")
+    connectButton.innerHTML = "DISCONNECT";
+    WCconnected = true;
+    console.info("Wallet Connected");
   }
 }
 
-async function onDisconnect() {
+async function WCdisconnect() {
     try {
       await web3Modal.disconnect({
-        topic: session.topic,
+        topic: WCsession.topic,
         code: 6000,
         message: "User disconnected",
       });
@@ -79,10 +76,10 @@ async function onDisconnect() {
       console.log(e);
     } finally {
       connectButton.disabled = false;
-      console.info("Disconnected!!!")
+      connectButton.innerHTML = "CONNECT";
+      WCconnected = false;
+      console.info("Wallet Disconnected");
     }
   }
 
-// 4. Create connection handler
-connectButton.addEventListener("click", onConnect);
-disconnectButton.addEventListener("click", onDisconnect);
+connectButton.addEventListener("click", WCToggle);
