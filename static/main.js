@@ -23,6 +23,11 @@ const disconnectButton = document.getElementById("disconnect-button");
 
 let session;
 
+function logData(data) {
+    console.log('############################')
+    console.info(data)
+}
+
 // 2. Create modal client, add your project id
 const web3Modal = new WalletConnectModalSign({
   projectId: "4b158e5711a8ed2e288d76772f6beaaf",
@@ -34,6 +39,10 @@ const web3Modal = new WalletConnectModalSign({
   },
 });
 
+web3Modal.onSessionEvent(logData);
+web3Modal.onSessionDelete(logData)
+
+console.log("!!!!!!!")
 console.log(web3Modal)
 
 // 3. Connect
@@ -50,10 +59,12 @@ async function onConnect() {
       },
     });
     console.info(session);
+
   } catch (err) {
     console.error(err);
   } finally {
     connectButton.disabled = false;
+    console.info("Connected!!!")
   }
 }
 
@@ -66,6 +77,9 @@ async function onDisconnect() {
       });
     } catch (e) {
       console.log(e);
+    } finally {
+      connectButton.disabled = false;
+      console.info("Disconnected!!!")
     }
   }
 
