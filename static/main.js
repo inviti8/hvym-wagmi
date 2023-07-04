@@ -1,3 +1,4 @@
+import { WalletConnectModalSign } from "https://unpkg.com/@walletconnect/modal-sign-html@2.5.8";
 import {
   EthereumClient,
   w3mConnectors,
@@ -7,7 +8,7 @@ import {
   WagmiCoreConnectors,
 } from "https://unpkg.com/@web3modal/ethereum@2.6.2";
 
-import { WalletConnectModalSign } from "https://unpkg.com/@walletconnect/modal-sign-html@2.5.8";
+import { Web3Modal } from "https://unpkg.com/@web3modal/html@2.6.2";
 
 // 0. Import wagmi dependencies
 const { mainnet, polygon, avalanche, arbitrum } = WagmiCoreChains;
@@ -18,6 +19,9 @@ const chains = [mainnet, polygon, avalanche, arbitrum];
 
 // 1. Define ui elements
 const connectButton = document.getElementById("connect-button");
+const disconnectButton = document.getElementById("disconnect-button");
+
+let session;
 
 // 2. Create modal client, add your project id
 const web3Modal = new WalletConnectModalSign({
@@ -36,7 +40,7 @@ console.log(web3Modal)
 async function onConnect() {
   try {
     connectButton.disabled = true;
-    const session = await web3Modal.connect({
+    session = await web3Modal.connect({
       requiredNamespaces: {
         eip155: {
           methods: ["eth_sendTransaction", "personal_sign"],
@@ -45,7 +49,6 @@ async function onConnect() {
         },
       },
     });
-    console.log(session);
     console.info(session);
   } catch (err) {
     console.error(err);
@@ -54,5 +57,18 @@ async function onConnect() {
   }
 }
 
+async function onDisconnect() {
+    try {
+      await web3Modal.disconnect({
+        topic: session.topic,
+        code: 6000,
+        message: "User disconnected",
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
 // 4. Create connection handler
 connectButton.addEventListener("click", onConnect);
+disconnectButton.addEventListener("click", onDisconnect);
