@@ -17,9 +17,9 @@ const { configureChains, createConfig } = WagmiCore;
 const chains = [mainnet, polygon, avalanche, arbitrum];
 
 const connectButton = document.getElementById("connect-button");
-const signButton = document.getElementById("sign-button");
+//const signButton = document.getElementById("sign-button");
 
-let WCsession;
+let WCsession = null;
 let WCconnected = false;
 let account = null;
 let signature = null;
@@ -35,14 +35,19 @@ const web3Modal = new WalletConnectModalSign({
 });
 
 web3Modal.onSessionEvent((event) => {
-  console.info("Session Event:", event);
-  if(event == "session_deleted"){
-    console.info("Session deleted.")
-    WCreset();
-  }
-});
+    if(event == "chainChanged"){
+        console.info("Chain changed.")
 
-console.log(web3Modal)
+    }
+    if(event == "accountsChanged"){
+        console.info("Chain changed.")
+
+    }
+    if(event == "session_deleted"){
+        console.info("Session deleted.")
+        WCreset();
+    }
+});
 
 function WCToggle(){
     if(WCconnected){
@@ -50,11 +55,6 @@ function WCToggle(){
     }else{
         WCconnect()
     }
-}
-
-function WCSign(){
-    const nonce = 123456789;
-    WCsignNonce(nonce);
 }
 
 function WCreset(){
@@ -71,7 +71,7 @@ async function WCconnect(callback = null) {
     WCsession = await web3Modal.connect({
       requiredNamespaces: {
         eip155: {
-          methods: ["eth_sendTransaction", "personal_sign"],
+          methods: ["personal_sign"],
           chains: ["eip155:1"],
           events: ["chainChanged", "accountsChanged", "session_deleted"],
         },
@@ -120,8 +120,8 @@ async function WCsignNonce(nonce, callback = null){
                 callback(nonce, account, signature);
             }
         }
-        
     }
+
 }
 
 async function WCdisconnect() {
@@ -137,7 +137,9 @@ async function WCdisconnect() {
       WCreset();
       console.info("Wallet Disconnected");
     }
-  }
+}
 
-connectButton.addEventListener("click", WCToggle);
-signButton.addEventListener("click", WCSign);
+if(connectButton != null){
+  connectButton.addEventListener("click", WCToggle);  
+}
+
