@@ -19,35 +19,38 @@ const chains = [mainnet, polygon, avalanche, arbitrum];
 const connectButton = document.getElementById("connect-button");
 //const signButton = document.getElementById("sign-button");
 
+let web3Modal = null;
 let WCsession = null;
 let WCconnected = false;
 let account = null;
 let signature = null;
 
-const web3Modal = new WalletConnectModalSign({
-  projectId: "4b158e5711a8ed2e288d76772f6beaaf",
-  metadata: {
-    name: "My Dapp",
-    description: "My Dapp description",
-    url: "https://my-dapp.com",
-    icons: ["https://my-dapp.com/logo.png"],
-  },
-});
+function WCinit(projectId, name, description, url, icons){
+    web3Modal = new WalletConnectModalSign({
+      projectId: projectId,
+      metadata: {
+        name: name,
+        description: description,
+        url: url,
+        icons: icons,
+      },
+    });
 
-web3Modal.onSessionEvent((event) => {
-    if(event == "chainChanged"){
-        console.info("Chain changed.")
+    web3Modal.onSessionEvent((event) => {
+        if(event == "chainChanged"){
+            console.info("Chain changed.")
 
-    }
-    if(event == "accountsChanged"){
-        console.info("Chain changed.")
+        }
+        if(event == "accountsChanged"){
+            console.info("Chain changed.")
 
-    }
-    if(event == "session_deleted"){
-        console.info("Session deleted.")
-        WCreset();
-    }
-});
+        }
+        if(event == "session_deleted"){
+            console.info("Session deleted.")
+            WCreset();
+        }
+    });
+}
 
 function WCToggle(){
     if(WCconnected){
@@ -142,4 +145,7 @@ async function WCdisconnect() {
 if(connectButton != null){
   connectButton.addEventListener("click", WCToggle);  
 }
+
+//initialization example:
+//WCinit("4b158e5711a8ed2e288d76772f6beaaf", "My Dapp", "My Dapp description", "https://my-dapp.com", ["https://my-dapp.com/logo.png"]);
 
