@@ -116,18 +116,16 @@ async function WCsignNonce(nonce, callback = null){
         } catch (err) {
             console.error(err);
         } finally {
-            console.log("Nonce:", nonce);
-            console.log("Address:", account);
-            console.log("Signature:", signature);
+            console.info("Transaction signed.")
             if (typeof callback === "function") {
-                callback(nonce, account, signature);
+                callback(signature);
             }
         }
     }
 
 }
 
-async function WCdisconnect() {
+async function WCdisconnect(callback = null) {
     try {
       await web3Modal.disconnect({
         topic: WCsession.topic,
@@ -138,7 +136,10 @@ async function WCdisconnect() {
       console.log(e);
     } finally {
       WCreset();
-      console.info("Wallet Disconnected");
+        console.info("Wallet Disconnected");
+        if (typeof callback === "function") {
+            callback();
+        }
     }
 }
 
