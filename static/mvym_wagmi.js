@@ -10,7 +10,6 @@ import {
 
 import { Web3Modal } from "https://unpkg.com/@web3modal/html@2.6.2";
 
-// 0. Import wagmi dependencies
 const { mainnet, polygon, avalanche, arbitrum } = WagmiCoreChains;
 const { configureChains, createConfig } = WagmiCore;
 
